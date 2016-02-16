@@ -1,0 +1,242 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Kick/Ban</p>
+        <button class="delete" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <form action="/action" method="post">
+          <input type="text" style="display: none" id="targetId" name="targetId" value="">
+          <div class="level">
+            <div class="level-item">
+              <div class="content">
+                <h2>Bruger <strong><span id="targetName">qew</span></strong></h2>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-centered">
+            <div class="field">
+              <label class="label">Type</label>
+
+              <div class="control">
+                <label class="radio">
+                  <input type="radio" name="actionType" id="modalKick" value="kick" required>
+                  Kick
+                </label>
+                <label class="radio">
+                  <input type="radio" name="actionType" id="modalBan" value="ban">
+                  Ban
+                </label>
+                <label class="radio">
+                  <input type="radio" name="actionType" id="modalMute" value="mute">
+                  Mute
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="field is-grouped is-grouped-centered hidden" id="modalMinutes">
+            <div class="field">
+              <label class="label">Antal minutter</label>
+              <div class="control has-icons-left">
+                <input class="input" type="number" placeholder="Text input" name="minutes" min="1" max="15" value="1">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped is-grouped-centered">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" name="anon" id="modalAnon">
+                Anonymt
+              </label>
+            </div>
+          </div>
+
+
+          <div class="field is-grouped is-grouped-right">
+            <div class="control">
+              Pris: <span id="modalPrice">0</span> kr.
+            </div>
+            <div class="control">
+              <input type="submit" class="button is-link" value="Køb">
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+
+  <div class="columns is-centered">
+    <div class="column is-5">
+      {% if  current_user.is_authenticated %}
+        <div class="box">
+          <div class="content">
+            <h3>Velkommen <strong>{{ current_user.name }}</strong></h3>
+            <p>Din konto-balance er lige nu <em>{{ "%.2f" | format(current_user.balance|round(2, 'floor')) }} kr.</em>
+            </p>
+          </div>
+        </div>
+      {% endif %}
+      <div class="box">
+        <div class="content">
+          {% if not current_user.is_authenticated %}
+            <h1>Teamspeak Pay2Ban</h1>
+            <h5 class="is-marginless">Er du træt af dine venner og har du lyst til at betale penge for at vise det?</h5>
+            <h5><strong>Så er Pay2Ban lige noget for dig! </strong></h5>
+            <p>Pay2Ban er den revolutionerende teknologi, der tillader dig at banne hvem som helst* fra <i>FireProof's
+              TeamSpeak server</i> for en meget lille gebyr.</p>
+          {% endif %}
+          <h3>Nuværende gebyr</h3>
+          <table>
+            <tbody>
+            <tr>
+              <td>Kick</td>
+              <td>2 kr</td>
+            </tr>
+            <tr>
+              <td>Ban x minutter</td>
+              <td>Kick + 4 * x</td>
+            </tr>
+            <tr>
+              <td>Mute x minutter</td>
+              <td>Kick + 2 * x</td>
+            </tr>
+            <tr>
+              <td>Anonymt</td>
+              <td>2 kr</td>
+            </tr>
+            </tbody>
+          </table>
+          <small>* Nogle bruger kan være beskyttet</small>
+        </div>
+      </div>
+
+
+      <div class="box">
+        {% for action in actions %}
+          <article class="media">
+            <div class="media-content">
+              <div class="content">
+                <p>
+                  {% set minutes = action.length.total_seconds()|int // 60 %}
+                  {% if action.type == "kick" %}
+                    <strong>{{ action.target_name }}</strong> er blevet kicked
+                  {% elif action.type == "ban" %}
+                    <strong>{{ action.target_name }}</strong> er blevet bannet i {{ minutes }} {{ 'minut' if minutes == 1 else "minutter" }}
+                  {% elif action.type == "mute" %}
+                    <strong>{{ action.target_name }}</strong> er blevet muted i {{ minutes }} {{ 'minut' if minutes == 1 else "minutter" }}
+                  {% endif %}
+                  <br>
+                  {% if action.anon %}
+                    <small>anon</small>
+                  {% else %}
+                    <small>@{{ action.user.name }}</small>
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+            <div class="media-right">
+              <p><i class="fa fa-clock-o"></i> {{ action.time.strftime("%H:%M") }}</p>
+              <p class="is-pulled-right"> {{ action.time.strftime("%d/%m") }}</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+
+    </div>
+    <div class="column is-narrow">
+      <div class="box">
+        {% for channel in channels %}
+          {% if channel["type"] == "spacer" %}
+            <div class="spacer">{{ channel["name"].split("]")[1] }}</div>
+          {% else %}
+            <div class="channel">{{ channel["name"] }}</div>
+          {% endif %}
+          {% for user in channel["clients"] %}
+            <div class="level client is-marginless" data-userid="{{ user["cui"] }}" data-name="{{ user["name"] }}">
+              <div class="level-left">
+                <div class="level-item">
+                  {{ user["name"] }}
+                </div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  {% if user["cui"] not in config["PROTECTED_CUI"] %}
+                    <a class="ban" href="#">BAN <img src="/static/hammer.svg" alt=""></a> {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block js %}
+  <script>
+      function calcPrice() {
+          let price = 0;
+          if (document.querySelector("#modalKick").checked){
+              price += 2;
+              if (document.querySelector("#modalAnon").checked){
+                  price += 2;
+              }
+         } else if (document.querySelector("#modalBan").checked){
+              price += 4 * parseInt(document.getElementsByName("minutes")[0].value) + 2;
+              if (document.querySelector("#modalAnon").checked){
+                  price += 2;
+              }
+          }else if (document.querySelector("#modalMute").checked){
+              price += 2 * parseInt(document.getElementsByName("minutes")[0].value) + 2;
+              if (document.querySelector("#modalAnon").checked){
+                  price += 2;
+              }
+          }
+
+          document.querySelector("#modalPrice").innerHTML = "" + price;
+      }
+
+
+      addEventListenerList(document.querySelectorAll('.ban'), 'click', (event) => {
+          event.preventDefault();
+          console.log(event.target);
+
+          let user_elm = event.target.closest('.client');
+          document.querySelector('#targetId').setAttribute('value', user_elm.dataset['userid']);
+          document.querySelector('#targetName').innerHTML = user_elm.dataset['name'];
+          document.getElementsByName("actionType").forEach(elm => {
+              elm.checked = false;
+          });
+
+          let modal_minutes = document.querySelector("#modalMinutes");
+          modal_minutes.classList.add("hidden");
+
+          document.querySelector("#modalKick").addEventListener('click', () => {modal_minutes.classList.add("hidden")});
+          document.querySelector("#modalBan").addEventListener('click', () => {modal_minutes.classList.remove("hidden")});
+          document.querySelector("#modalMute").addEventListener('click', () => {modal_minutes.classList.remove("hidden")});
+
+          setInterval(function() { calcPrice(); }, 100);
+
+          let modal = document.querySelector('.modal');  // assuming you have only 1
+          let html = document.querySelector('html');
+          modal.classList.add('is-active');
+          html.classList.add('is-clipped');
+          addEventListenerList(modal.querySelectorAll('.modal-background, .delete'), 'click', function (e) {
+              e.preventDefault();
+              modal.classList.remove('is-active');
+              html.classList.remove('is-clipped');
+          });
+      })
+  </script>
+{% endblock %}

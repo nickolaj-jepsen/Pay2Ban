@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <div class="box">
+        <div class="content">
+          <h2>Register</h2>
+
+          <form action="" method="post">
+            <div class="field">
+              <label class="label">Brugernavn</label>
+              <div class="control has-icons-left">
+                <input name="username" class="input {{ 'is-danger' if errors["username"] != none }}" type="text" placeholder="Brugernavn">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-user"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["username"] if errors["username"] != none }}</p>
+           </div>
+            <div class="field">
+              <label class="label">Email</label>
+              <div class="control has-icons-left">
+                <input name="email" class="input {{ 'is-danger' if errors["email"] != none }}" type="email" placeholder="Email">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-envelope"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["email"] if errors["email"] != none }}</p>
+            </div>
+            <div class="field">
+              <label class="label">Adgangskode</label>
+              <div class="control has-icons-left">
+                <input name="password" class="input {{ 'is-danger' if errors["password"] != none }}" type="password" placeholder="Adgangskode">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Gentag Adgangskode</label>
+              <div class="control has-icons-left">
+                <input name="passwordRepeat" class="input {{ 'is-danger' if errors["password"] != none }}" type="password" placeholder="Gentag Adgangskode">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["password"] if errors["password"] != none }}</p>
+            </div>
+            <div class="field is-grouped is-grouped-centered">
+              <div class="g-recaptcha" data-sitekey="{{site_key}}"></div>
+              <p class="help is-danger">{{ errors["recaptcha"] if errors["recaptcha"] != none }}</p>
+
+            </div>
+
+            <div class="field is-grouped is-grouped-right">
+              <div class="control">
+                <button class="button is-link">Opret</button>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

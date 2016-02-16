@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+  <div class="columns is-centered">
+    <div class="column is-5">
+      <div class="box">
+        <div class="content">
+          <h2>Register</h2>
+
+          <form action="" method="post">
+            <div class="field">
+              <label class="label">Gamle adgangskode</label>
+              <div class="control has-icons-left">
+                <input name="oldPassword" class="input {{ 'is-danger' if errors["old_password"] != none }}" type="password" placeholder="Gamle adgangskode">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["old_password"] if errors["old_password"] != none }}</p>
+
+            </div>
+
+            <div class="field">
+              <label class="label">Ny adgangskode</label>
+              <div class="control has-icons-left">
+                <input name="newPassword" class="input {{ 'is-danger' if errors["new_password"] != none }}" type="password" placeholder="Ny adgangskode">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["new_password"] if errors["new_password"] != none }}</p>
+
+            </div>
+            <div class="field">
+              <label class="label">Gentag ny adgangskode</label>
+              <div class="control has-icons-left">
+                <input name="newPasswordRepeat" class="input {{ 'is-danger' if errors["new_password_repeat"] != none }}" type="password" placeholder="Gentag ny adgangskode">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-lock"></i>
+                </span>
+              </div>
+              <p class="help is-danger">{{ errors["new_password_repeat"] if errors["new_password_repeat"] != none }}</p>
+            </div>
+            <div class="field is-grouped is-grouped-right">
+              <div class="control">
+                <button class="button is-link">Gem</button>
+              </div>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

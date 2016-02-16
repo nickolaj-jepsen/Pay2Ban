@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pay2Ban</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='boilerplate.css') }}">
+</head>
+<body>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class=flashes>
+
+      {% for category, message in messages %}
+        <div class="notification is-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+
+  <nav class="navbar is-dark" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        Pay2Ban
+      </a>
+      <button class="button navbar-burger is-dark" data-target="navMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="navbar-menu" id="navMenu">
+      <div class="navbar-end">
+        {% if  current_user.is_authenticated %}
+          {% if current_user.admin %}
+            <a class="navbar-item" href="/admin">
+              Admin <i class="fa fa-lock"></i>
+            </a>
+          {% endif %}
+          <a class="navbar-item" href="/settings">
+            Indstillinger <i class="fa fa-cog"></i>
+          </a>
+          <a class="navbar-item" href="/logout">
+            Logud <i class="fa fa-sign-out"></i>
+          </a>
+        {% else %}
+          <a class="navbar-item" href="/login">
+            Login <i class="fa fa-sign-in"></i>
+          </a>
+          <a class="navbar-item" href="/register">
+            Register <i class="fa fa-user-plus"></i>
+          </a>
+
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  {% if not config.DEBUG %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-44509395-6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-44509395-6');
+    </script>
+  {% endif %}
+
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script src="{{ url_for('static', filename='boilerplate.js') }}"></script>
+  {% block js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="columns is-centered">
+    <div class="column is-11">
+    <div class="level">
+      <div class="level-item">
+        <a href="/flask-admin" class="button is-large is-link">Flask Admin</a>
+      </div>
+    </div>
+
+      <div class="box">
+        <div class="content">
+          <table class="table">
+            <thead>
+              <th>id</th>
+              <th>Navn</th>
+              <th>Email</th>
+              <th>Balance</th>
+              <th>Oprettet</th>
+              <th></th>
+            </thead>
+            <tbody>
+            {% for user in users %}
+              <tr data-id="{{ user.id }}">
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ "%.2f" | format(user.balance|round(2, 'floor')) }} kr.</td>
+                <td>{{ user.creation_date.strftime("%x %X") }}</td>
+                <td>
+                  <button class="button add-balance">Tilføj Balance</button>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
+{% block js %}
+  <script>
+      addEventListenerList(document.querySelectorAll('.add-balance'), 'click', (event) => {
+          let amount = window.prompt("Amount");
+          let user_id = event.target.parentNode.parentNode.dataset["id"];
+
+          fetch("/api/user/" + user_id + "/balance", {
+              method: "POST",
+              credentials: "same-origin",
+              body: JSON.stringify({
+                  amount: amount
+              }),
+              headers: {
+                  'Accept': 'application/json, text/plain, */*',
+                  'Content-Type': 'application/json'
+              },
+          }).then(() => {
+              location.reload()
+          })
+      })
+  </script>
+{% endblock %}

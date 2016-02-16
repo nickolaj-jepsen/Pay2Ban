@@ -1,0 +1,9 @@
+requests
+flask
+flask_migrate
+flask_sqlalchemy
+flask-login
+flask-admin
+ts3
+psycopg2
+flask-bcrypt
